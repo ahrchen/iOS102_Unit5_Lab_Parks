@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var parks: [Park] = []
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -18,22 +21,27 @@ struct ContentView: View {
         .padding()
         .onAppear {
             Task {
-                guard let url = URL(string: "https://developer.nps.gov/api/v1/parks?stateCode=wa&api_key={YOUR_API_KEY}") else {
-                    return
-                }
-                do {
-                    let(data, _) = try await URLSession.shared.data(from: url)
-                    
-                    let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
-                    
-                    let prettyPrintedData = try JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted)
-                    if let prettyPrintedString = String(data:prettyPrintedData, encoding: .utf8) {
-                        print(prettyPrintedString)
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
+                await fetchParks()
             }
+        }
+    }
+    
+    private func fetchParks() async {
+        let url = URL(string: "https://developer.nps.gov/api/v1/parks?stateCode=wa&api_key={Your own key}")!
+        do {
+            let(data, _) = try await URLSession.shared.data(from: url)
+            
+            let parksResponse = try JSONDecoder().decode(ParksResponse.self,  from: data)
+            
+            let parks = parksResponse.data
+            
+            self.parks = parks
+            
+            for park in parks {
+                print(park.fullName)
+            }
+        } catch {
+            print(error.localizedDescription)
         }
     }
 }
