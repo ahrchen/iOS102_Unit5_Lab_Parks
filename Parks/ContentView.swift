@@ -12,12 +12,20 @@ struct ContentView: View {
     @State private var parks: [Park] = []
     
     var body: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(parks) { park in
-                    ParkRow(park: park)
+        NavigationStack {
+            ScrollView {
+                LazyVStack {
+                    ForEach(parks) { park in
+                        NavigationLink(value: park) {
+                            ParkRow(park: park)
+                        }
+                    }
                 }
             }
+            .navigationDestination(for: Park.self, destination: { park in
+                ParkDetailView(park: park)
+            })
+            .navigationTitle("National Parks")
         }
         .onAppear {
             Task {
@@ -36,10 +44,7 @@ struct ContentView: View {
             let parks = parksResponse.data
             
             self.parks = parks
-            
-            for park in parks {
-                print(park.fullName)
-            }
+
         } catch {
             print(error.localizedDescription)
         }

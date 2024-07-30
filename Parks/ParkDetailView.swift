@@ -59,7 +59,6 @@ struct ParkDetailView: View {
                 
             }
         }
-        
     }
 }
 
