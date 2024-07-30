@@ -12,13 +12,14 @@ struct ContentView: View {
     @State private var parks: [Park] = []
     
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        ScrollView {
+            LazyVStack {
+                ForEach(parks) { park in
+                    Text(park.name)
+                        .font(.title)
+                }
+            }
         }
-        .padding()
         .onAppear {
             Task {
                 await fetchParks()
@@ -27,7 +28,7 @@ struct ContentView: View {
     }
     
     private func fetchParks() async {
-        let url = URL(string: "https://developer.nps.gov/api/v1/parks?stateCode=wa&api_key={Your own key}")!
+        let url = URL(string: "https://developer.nps.gov/api/v1/parks?stateCode=wa&api_key=YourKey")!
         do {
             let(data, _) = try await URLSession.shared.data(from: url)
             
